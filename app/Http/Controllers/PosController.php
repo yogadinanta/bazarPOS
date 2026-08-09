@@ -15,7 +15,8 @@ class PosController extends Controller
     public function index()
     {
         $categories = Category::all();
-        $products = Product::all();
+        // Menggunakan paginate (misal 20 produk per halaman) agar refresh halaman POS tidak berat
+        $products = Product::paginate(20); 
         $vouchers = Voucher::where('is_used', false)->get(['code']);
 
         return view('pos.index', compact('categories', 'products', 'vouchers'));
@@ -23,19 +24,20 @@ class PosController extends Controller
 
     public function store(Request $request)
     {
-        // Ubah validasi dari 'voucher_code' (string) menjadi 'voucher_codes' (array)
         $request->validate([
             'cart' => 'required|array',
             'voucher_codes' => 'nullable|array',
-            'voucher_codes.*' => 'string'
+            'voucher_codes.*' => 'string',
+            'order_type' => 'required|string|in:dine_in,take_away'
         ]);
 
         $cart = $request->input('cart');
         $voucherCodes = $request->input('voucher_codes', []);
+        $orderType = $request->input('order_type');
 
         DB::beginTransaction();
         try {
-            // Validasi semua voucher yang dikirimkan
+            // Validasi ketersediaan setiap voucher di database
             if (!empty($voucherCodes)) {
                 foreach ($voucherCodes as $code) {
                     $checkVoucher = DB::table('vouchers')->where('code', $code)->where('is_used', false)->first();
@@ -45,13 +47,13 @@ class PosController extends Controller
                 }
             }
 
-            // Karena kolom 'voucher_code' di tabel orders biasanya bertipe string (menyimpan satu teks), 
-            // Anda bisa menggabungkannya dengan koma, misal: "007, 008" atau menyesuaikan kolom database Anda.
+            // Gabungkan array kode voucher menjadi teks koma, misal: "007, 008"
             $voucherString = !empty($voucherCodes) ? implode(', ', $voucherCodes) : null;
 
             $order = Order::create([
                 'voucher_code' => $voucherString,
-                'total_items' => count($cart)
+                'total_items' => count($cart),
+                'order_type' => $orderType
             ]);
 
             foreach ($cart as $item) {
@@ -63,7 +65,7 @@ class PosController extends Controller
                 ]);
             }
 
-            // Tandai semua voucher yang digunakan menjadi status 'is_used' = true
+            // Update status voucher yang digunakan menjadi aktif (terpakai)
             if (!empty($voucherCodes)) {
                 DB::table('vouchers')->whereIn('code', $voucherCodes)->update([
                     'is_used' => true,

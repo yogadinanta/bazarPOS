@@ -48,6 +48,10 @@
             <span>RESI: #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
             <span>CASH</span>
         </div>
+        <div class="flex-between">
+            <span>TIPE:</span>
+            <span style="font-weight: bold;">{{ isset($order->order_type) ? ($order->order_type == 'dine_in' ? 'DINE IN' : 'TAKE AWAY') : 'DINE IN' }}</span>
+        </div>
         <p>TGL  : <span id="local-time">--/--/---- --:--:--</span></p>
         <p>KASIR: Administrator</p>
     </div>
@@ -89,14 +93,14 @@
     
     <div class="text-center bg-gray my-2">
         <p style="margin: 0; font-size: 10px; letter-spacing: 0.5px;">VOUCHER DIGUNAKAN</p>
-        <p style="margin: 4px 0 0 0; font-weight: bold; font-size: 13px; letter-spacing: 2px;">
+        <p style="margin: 4px 0 0 0; font-weight: bold; font-size: 12px; letter-spacing: 1px; word-break: break-all;">
             {{ $order->voucher_code ? strtoupper($order->voucher_code) : '- TIDAK ADA -' }}
         </p>
     </div>
 
     <div class="border-b my-2"></div>
     
-    <div class="text-center" style="margin-top: 12px; font-size: 10px; space-y-05">
+    <div class="text-center" style="margin-top: 12px; font-size: 10px;">
         <p style="margin: 0 0 2px 0; font-weight: bold; font-size: 11px;">--- TERIMA KASIH ---</p>
         <p style="margin: 0;">BARANG YANG SUDAH DIBELI</p>
         <p style="margin: 0;">TIDAK DAPAT DITUKAR/DIKEMBALIKAN</p>
@@ -115,7 +119,6 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            // Satukan format waktu menjadi dd-mm-yyyy hh:mm:ss
             document.getElementById('local-time').innerText = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 
             // 2. TRIGGER PRINT DAN TUTUP OTOMATIS

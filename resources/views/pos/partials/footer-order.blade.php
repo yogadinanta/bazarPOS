@@ -6,14 +6,14 @@
         this.toast.show = true;
         setTimeout(() => { this.toast.show = false; }, 3000);
     },
-    appliedVouchers: [] // Diubah menjadi array untuk menampung banyak voucher
+    appliedVouchers: [],
+    orderType: 'dine_in' // Default pilihan pesanan
 }">
 
     <div class="bg-red-500 rounded-[30px] p-5 flex items-center justify-between">
         <div>
             <p class="text-red-200 text-xl">
                 <span x-text="cart.length"></span> items
-                {{-- Indikator badge jika ada voucher yang aktif --}}
                 <template x-if="appliedVouchers.length > 0">
                     <span class="ml-2 text-xs bg-white text-red-500 px-2 py-0.5 rounded-full font-bold" x-text="appliedVouchers.length + ' Voucher Aktif'"></span>
                 </template>
@@ -46,7 +46,30 @@
         >
             <div class="text-center mb-6">
                 <h3 class="text-2xl font-bold text-gray-800">Konfirmasi Pesanan</h3>
-                <p class="text-gray-500 mt-1">Silakan cek pesanan dan masukkan voucher jika ada</p>
+                <p class="text-gray-500 mt-1">Silakan pilih tipe pesanan, cek rincian, dan masukkan voucher</p>
+            </div>
+
+            {{-- PILIHAN TIPE PESANAN (DINE IN / TAKE AWAY) --}}
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-2 text-sm">Tipe Pesanan</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button 
+                        type="button"
+                        @click="orderType = 'dine_in'"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="orderType === 'dine_in' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-utensils"></i> Dine In (Makan di Tempat)
+                    </button>
+                    <button 
+                        type="button"
+                        @click="orderType = 'take_away'"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="orderType === 'take_away' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-bag-shopping"></i> Take Away (Bungkus)
+                    </button>
+                </div>
             </div>
 
             <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
@@ -55,7 +78,6 @@
                     <span class="font-bold text-gray-800" x-text="cart.length + ' Item'"></span>
                 </div>
                 
-                {{-- List Voucher yang Terpasang --}}
                 <template x-if="appliedVouchers.length > 0">
                     <div class="mb-2">
                         <span class="text-xs font-semibold text-green-600 block mb-1">Voucher Terpasang:</span>
@@ -91,7 +113,6 @@
                             if(!voucherCode) { showToast('Masukkan kode voucher!', 'warning'); return; }
                             let cleanCode = voucherCode.trim().toUpperCase();
                             
-                            // Cek apakah voucher sudah pernah dimasukkan sebelumnya
                             if(appliedVouchers.includes(cleanCode)) {
                                 showToast('Voucher sudah ditambahkan sebelumnya!', 'warning');
                                 return;
@@ -99,8 +120,8 @@
 
                             let found = vouchersList.find(v => v.code.toUpperCase() === cleanCode);
                             if(found) {
-                                appliedVouchers.push(found.code); // Tambahkan ke dalam array
-                                voucherCode = ''; // Reset input
+                                appliedVouchers.push(found.code);
+                                voucherCode = '';
                                 showToast('Voucher berhasil dipasang!', 'success');
                             } else {
                                 showToast('Maaf, voucher tidak valid atau hangus!', 'error');
@@ -123,14 +144,17 @@
                     @click="
                         if(cart.length === 0) { showToast('Keranjang masih kosong!', 'warning'); return; }
                         
-                        // Kirim array voucher ke backend (ubah key sesuai kebutuhan controller Anda, misal: voucher_codes)
                         fetch('{{ route('pos.store') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ cart: cart, voucher_codes: appliedVouchers })
+                            body: JSON.stringify({ 
+                                cart: cart, 
+                                voucher_codes: appliedVouchers,
+                                order_type: orderType // Mengirim tipe pesanan ke backend
+                            })
                         })
                         .then(response => response.json())
                         .then(data => {
@@ -140,15 +164,14 @@
 
                                 showToast('Transaksi Berhasil Disimpan!', 'success');
 
-                                // Hapus voucher yang terpakai dari daftar list lokal
                                 if (appliedVouchers.length > 0) {
                                     vouchersList = vouchersList.filter(v => !appliedVouchers.includes(v.code.toUpperCase()));
                                 }
 
-                                // Reset UI POS utama
                                 cart = [];
                                 appliedVouchers = [];
                                 voucherCode = '';
+                                orderType = 'dine_in';
                                 openModal = false;
                             } else {
                                 showToast('Gagal: ' + data.message, 'error');
@@ -164,7 +187,7 @@
         </div>
     </div>
 
-    {{-- TOAST NOTIFICATION (Sama seperti sebelumnya) --}}
+{{-- TOAST NOTIFICATION --}}
     <div 
         class="fixed top-5 right-5 z-[9999] space-y-2 pointer-events-none"
         x-show="toast.show"
@@ -184,6 +207,16 @@
                 'bg-amber-500 border-amber-600': toast.type === 'warning'
             }"
         >
+            <template x-if="toast.type === 'success'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+            </template>
+            <template x-if="toast.type === 'error'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+            </template>
+            <template x-if="toast.type === 'warning'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </template>
+
             <span x-text="toast.message"></span>
         </div>
     </div>

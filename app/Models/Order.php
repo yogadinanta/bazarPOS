@@ -10,7 +10,8 @@ class Order extends Model
     // Mengizinkan kolom ini diisi secara massal saat insert data
     protected $fillable = [
         'voucher_code',
-        'total_items'
+        'total_items',
+        'order_type' 
     ];
 
     // Relasi ke detail order (Satu order memiliki banyak detail menu)
