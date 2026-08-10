@@ -7,7 +7,8 @@
         setTimeout(() => { this.toast.show = false; }, 3000);
     },
     appliedVouchers: [],
-    orderType: 'dine_in' // Default pilihan pesanan
+    orderType: 'dine_in', // Default pilihan pesanan
+    paymentMethod: 'cash' // Default metode pembayaran
 }">
 
     <div class="bg-red-500 rounded-[30px] p-5 flex items-center justify-between">
@@ -72,6 +73,37 @@
                 </div>
             </div>
 
+            {{-- PILIHAN METODE PEMBAYARAN (CASH / QRIS / DEBIT) --}}
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-2 text-sm">Metode Pembayaran</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button 
+                        type="button"
+                        @click="paymentMethod = 'cash'; appliedVouchers = []"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="paymentMethod === 'cash' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-money-bill-wave"></i> Cash
+                    </button>
+                    <button 
+                        type="button"
+                        @click="paymentMethod = 'qris'"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="paymentMethod === 'qris' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-qrcode"></i> QRIS
+                    </button>
+                    <button 
+                        type="button"
+                        @click="paymentMethod = 'debit'"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="paymentMethod === 'debit' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-credit-card"></i> Debit
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
                 <div class="flex justify-between text-gray-600 mb-2">
                     <span>Total Item:</span>
@@ -98,7 +130,7 @@
                 </div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6" x-show="paymentMethod !== 'cash'" x-transition>
                 <label class="block text-gray-700 font-semibold mb-2 text-sm">Kode Voucher</label>
                 <div class="flex gap-2">
                     <input 
@@ -153,7 +185,8 @@
                             body: JSON.stringify({ 
                                 cart: cart, 
                                 voucher_codes: appliedVouchers,
-                                order_type: orderType // Mengirim tipe pesanan ke backend
+                                order_type: orderType,
+                                payment_method: paymentMethod
                             })
                         })
                         .then(response => response.json())
@@ -172,6 +205,7 @@
                                 appliedVouchers = [];
                                 voucherCode = '';
                                 orderType = 'dine_in';
+                                paymentMethod = 'cash';
                                 openModal = false;
                             } else {
                                 showToast('Gagal: ' + data.message, 'error');
