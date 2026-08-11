@@ -28,11 +28,14 @@ class PosController extends Controller
             'cart' => 'required|array',
             'voucher_codes' => 'nullable|array',
             'voucher_codes.*' => 'string',
-            'order_type' => 'required|string|in:dine_in,take_away'
+            'order_type' => 'required|string|in:dine_in,take_away',
+            'payment_method' => 'required|string|in:cash,qris,debit'
         ]);
 
         $cart = $request->input('cart');
-        $voucherCodes = $request->input('voucher_codes', []);
+        $paymentMethod = $request->input('payment_method');
+        // Jika bayar menggunakan cash, kosongkan voucher_codes
+        $voucherCodes = $paymentMethod === 'cash' ? [] : $request->input('voucher_codes', []);
         $orderType = $request->input('order_type');
 
         DB::beginTransaction();
@@ -53,7 +56,8 @@ class PosController extends Controller
             $order = Order::create([
                 'voucher_code' => $voucherString,
                 'total_items' => count($cart),
-                'order_type' => $orderType
+                'order_type' => $orderType,
+                'payment_method' => $paymentMethod
             ]);
 
             foreach ($cart as $item) {

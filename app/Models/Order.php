@@ -11,7 +11,8 @@ class Order extends Model
     protected $fillable = [
         'voucher_code',
         'total_items',
-        'order_type' 
+        'order_type',
+        'payment_method'
     ];
 
     // Relasi ke detail order (Satu order memiliki banyak detail menu)
