@@ -29,18 +29,21 @@ class PosController extends Controller
             'voucher_codes' => 'nullable|array',
             'voucher_codes.*' => 'string',
             'order_type' => 'required|string|in:dine_in,take_away',
-            'payment_method' => 'required|string|in:cash,qris,debit'
+            'payment_method' => 'required|string|in:cash,qris,kupon'
         ]);
 
         $cart = $request->input('cart');
         $paymentMethod = $request->input('payment_method');
-        // Jika bayar menggunakan cash, kosongkan voucher_codes
-        $voucherCodes = $paymentMethod === 'cash' ? [] : $request->input('voucher_codes', []);
+        // Jika bayar menggunakan selain kupon (seperti cash atau qris), kosongkan voucher_codes
+        $voucherCodes = $paymentMethod === 'kupon' ? $request->input('voucher_codes', []) : [];
         $orderType = $request->input('order_type');
 
         DB::beginTransaction();
         try {
-            // Validasi ketersediaan setiap voucher di database
+            // Validasi ketersediaan setiap voucher di database jika metode pembayaran kupon
+            if ($paymentMethod === 'kupon' && empty($voucherCodes)) {
+                return response()->json(['success' => false, 'message' => 'Metode pembayaran Kupon wajib menyertakan nomor kupon!'], 422);
+            }
             if (!empty($voucherCodes)) {
                 foreach ($voucherCodes as $code) {
                     $checkVoucher = DB::table('vouchers')->where('code', $code)->where('is_used', false)->first();

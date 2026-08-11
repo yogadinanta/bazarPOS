@@ -46,7 +46,7 @@
     <div class="space-y-05">
         <div class="flex-between">
             <span>RESI: #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
-            <span>CASH</span>
+            <span>{{ strtoupper($order->payment_method ?? 'CASH') }}</span>
         </div>
         <div class="flex-between">
             <span>TIPE:</span>
