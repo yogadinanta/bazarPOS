@@ -8,7 +8,7 @@
     },
     appliedVouchers: [],
     orderType: 'dine_in', // Default pilihan pesanan
-    paymentMethod: 'cash' // Default metode pembayaran
+    paymentMethod: 'kupon' // Default metode pembayaran
 }">
 
     <div class="bg-red-500 rounded-[30px] p-5 flex items-center justify-between">
@@ -79,6 +79,14 @@
                 <div class="grid grid-cols-3 gap-3">
                     <button 
                         type="button"
+                        @click="paymentMethod = 'kupon'"
+                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
+                        :class="paymentMethod === 'kupon' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
+                    >
+                        <i class="fa-solid fa-ticket"></i> Kupon
+                    </button>
+                    <button 
+                        type="button"
                         @click="paymentMethod = 'cash'; appliedVouchers = []"
                         class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
                         :class="paymentMethod === 'cash' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
@@ -87,19 +95,11 @@
                     </button>
                     <button 
                         type="button"
-                        @click="paymentMethod = 'qris'"
+                        @click="paymentMethod = 'qris'; appliedVouchers = []"
                         class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
                         :class="paymentMethod === 'qris' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
                     >
                         <i class="fa-solid fa-qrcode"></i> QRIS
-                    </button>
-                    <button 
-                        type="button"
-                        @click="paymentMethod = 'debit'"
-                        class="py-3 rounded-xl font-bold text-sm border-2 transition flex items-center justify-center gap-2"
-                        :class="paymentMethod === 'debit' ? 'border-red-500 bg-red-50 text-red-600 shadow-sm' : 'border-gray-200 text-gray-500 bg-white'"
-                    >
-                        <i class="fa-solid fa-credit-card"></i> Debit
                     </button>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                 </div>
             </div>
 
-            <div class="mb-6" x-show="paymentMethod !== 'cash'" x-transition>
+            <div class="mb-6" x-show="paymentMethod === 'kupon'" x-transition>
                 <label class="block text-gray-700 font-semibold mb-2 text-sm">Kode Voucher</label>
                 <div class="flex gap-2">
                     <input 
@@ -175,6 +175,7 @@
                     type="button"
                     @click="
                         if(cart.length === 0) { showToast('Keranjang masih kosong!', 'warning'); return; }
+                        if(paymentMethod === 'kupon' && appliedVouchers.length === 0) { showToast('Harap masukkan nomor kupon!', 'warning'); return; }
                         
                         fetch('{{ route('pos.store') }}', {
                             method: 'POST',
@@ -205,7 +206,7 @@
                                 appliedVouchers = [];
                                 voucherCode = '';
                                 orderType = 'dine_in';
-                                paymentMethod = 'cash';
+                                paymentMethod = 'kupon';
                                 openModal = false;
                             } else {
                                 showToast('Gagal: ' + data.message, 'error');
