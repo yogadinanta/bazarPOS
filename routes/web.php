@@ -69,3 +69,7 @@ Route::get('/admin/pos/history', [PosController::class, 'history'])->name('pos.h
 
 // Route Admin Riwayat Transaksi (Controller Terpisah)
 Route::get('/admin/history', [AdminHistoryController::class, 'index']);
+
+Route::get('/generate-voucher', [PosController::class, 'generateMoreVouchers']);
+// export
+Route::get('/admin/history/export', [PosController::class, 'exportHistory'])->name('admin.history.export');

@@ -12,6 +12,7 @@ class Order extends Model
         'voucher_code',
         'total_items',
         'order_type',
+        'table_number',
         'payment_method'
     ];
 

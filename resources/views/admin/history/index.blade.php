@@ -2,7 +2,8 @@
 
 @section('content')
 
-<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+{{-- HEADER & CONTROLS SECTION --}}
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
     <div>
         <h1 class="text-3xl font-bold text-gray-800">
             Riwayat Transaksi
@@ -10,30 +11,38 @@
         <p class="text-gray-400 text-sm mt-1">Daftar seluruh transaksi penjualan yang masuk secara real-time</p>
     </div>
 
-    {{-- Form Search / Filter Index --}}
-    <form action="{{ url('/admin/history') }}" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
-        <div class="relative w-full sm:w-72">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </span>
-            <input 
-                type="text" 
-                name="search" 
-                value="{{ request('search') }}" 
-                placeholder="Cari ID resi atau voucher..." 
-                class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 shadow-xs"
-            >
-        </div>
-        @if(request('search'))
-            <a href="{{ url('/admin/history') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-2xl text-sm font-bold transition">
-                Reset
-            </a>
-        @else
-            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-xs transition">
-                Cari
-            </button>
-        @endif
-    </form>
+    {{-- ACTION BUTTONS & SEARCH BAR --}}
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+        {{-- Tombol Export Excel --}}
+        <a href="{{ route('admin.history.export', ['search' => request('search')]) }}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-xs transition inline-flex items-center justify-center gap-2 shrink-0">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+        </a>
+
+        {{-- Form Search / Filter Index --}}
+        <form action="{{ url('/admin/history') }}" method="GET" class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="relative w-full sm:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    placeholder="Cari ID resi atau voucher..." 
+                    class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 shadow-xs"
+                >
+            </div>
+            @if(request('search'))
+                <a href="{{ url('/admin/history') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2.5 rounded-2xl text-sm font-bold transition shrink-0">
+                    Reset
+                </a>
+            @else
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-2xl text-sm font-bold shadow-xs transition shrink-0">
+                    Cari
+                </button>
+            @endif
+        </form>
+    </div>
 </div>
 
 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">

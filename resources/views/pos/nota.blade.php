@@ -50,8 +50,16 @@
         </div>
         <div class="flex-between">
             <span>TIPE:</span>
-            <span style="font-weight: bold;">{{ isset($order->order_type) ? ($order->order_type == 'dine_in' ? 'DINE IN' : 'TAKE AWAY') : 'DINE IN' }}</span>
+            <span style="font-weight: bold;">
+                {{ isset($order->order_type) ? ($order->order_type == 'dine_in' ? 'DINE IN' : 'TAKE AWAY') : 'DINE IN' }}
+            </span>
         </div>
+        @if($order->order_type == 'dine_in' && !empty($order->table_number))
+        <div class="flex-between">
+            <span>NO MEJA:</span>
+            <span style="font-weight: bold;">{{ strtoupper($order->table_number) }}</span>
+        </div>
+        @endif
         <p>TGL  : <span id="local-time">--/--/---- --:--:--</span></p>
         <p>KASIR: Administrator</p>
     </div>

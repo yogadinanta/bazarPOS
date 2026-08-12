@@ -8,6 +8,7 @@
     },
     appliedVouchers: [],
     orderType: 'dine_in', // Default pilihan pesanan
+    tableNumber: '',
     paymentMethod: 'kupon' // Default metode pembayaran
 }">
 
@@ -64,7 +65,7 @@
                     </button>
                     <button 
                         type="button"
-                        @click="orderType = 'take_away'"
+                        @click="orderType = 'take_away'; tableNumber = ''"
                         class="py-2 rounded-lg font-bold text-xs border transition flex items-center justify-center gap-1.5"
                         :class="orderType === 'take_away' ? 'border-red-500 bg-red-50 text-red-600 shadow-xs' : 'border-gray-200 text-gray-500 bg-white'"
                     >
@@ -72,7 +73,27 @@
                     </button>
                 </div>
             </div>
+            {{-- NOMOR MEJA --}}
+            <div class="mb-4" x-show="orderType === 'dine_in'" x-transition>
+                <label class="block text-gray-600 font-semibold mb-1.5 text-xs">
+                    Nomor Meja
+                </label>
 
+                <input
+                    type="text"
+                    x-model="tableNumber"
+                    placeholder="Contoh: 01 / A1 / VIP-1"
+                    maxlength="50"
+                    @keydown.enter.prevent
+                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg
+                           focus:outline-none focus:ring-1 focus:ring-red-500
+                           text-xs font-semibold"
+                >
+
+                <p class="text-[10px] text-gray-400 mt-1">
+                    Wajib diisi untuk pesanan Dine In
+                </p>
+            </div>
             {{-- PILIHAN METODE PEMBAYARAN (KUPON / CASH / QRIS) --}}
             <div class="mb-4">
                 <label class="block text-gray-600 font-semibold mb-1.5 text-xs">Metode Pembayaran</label>
@@ -174,19 +195,34 @@
                 <button 
                     type="button"
                     @click="
-                        if(cart.length === 0) { showToast('Keranjang masih kosong!', 'warning'); return; }
-                        if(paymentMethod === 'kupon' && appliedVouchers.length === 0) { showToast('Harap masukkan nomor kupon!', 'warning'); return; }
-                        
+                        if(cart.length === 0) {
+                            showToast('Keranjang masih kosong!', 'warning');
+                            return;
+                        }
+
+                        if(paymentMethod === 'kupon' && appliedVouchers.length === 0) {
+                            showToast('Harap masukkan nomor kupon!', 'warning');
+                            return;
+                        }
+
+                        if(orderType === 'dine_in' && !tableNumber.trim()) {
+                            showToast('Harap masukkan nomor meja!', 'warning');
+                            return;
+                        }
+
                         fetch('{{ route('pos.store') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
-                            body: JSON.stringify({ 
-                                cart: cart, 
+                            body: JSON.stringify({
+                                cart: cart,
                                 voucher_codes: appliedVouchers,
                                 order_type: orderType,
+                                table_number: orderType === 'dine_in'
+                                    ? tableNumber.trim()
+                                    : null,
                                 payment_method: paymentMethod
                             })
                         })
@@ -206,6 +242,7 @@
                                 appliedVouchers = [];
                                 voucherCode = '';
                                 orderType = 'dine_in';
+                                tableNumber = '';
                                 paymentMethod = 'kupon';
                                 openModal = false;
                             } else {
