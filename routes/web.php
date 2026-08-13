@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\AdminHistoryController;
+use App\Http\Controllers\TicketOtsController;
 
 
 Route::get('/', function () {
@@ -73,3 +74,9 @@ Route::get('/admin/history', [AdminHistoryController::class, 'index']);
 Route::get('/generate-voucher', [PosController::class, 'generateMoreVouchers']);
 // export
 Route::get('/admin/history/export', [PosController::class, 'exportHistory'])->name('admin.history.export');
+
+// Route Ticket OTS
+Route::get('/admin/ticket-ots', [TicketOtsController::class, 'index'])->name('admin.ticket.ots');
+Route::post('/admin/ticket-ots/store', [TicketOtsController::class, 'store'])->name('admin.ticket.store');
+Route::get('/admin/ticket-ots/history', [TicketOtsController::class, 'history'])->name('admin.ticket.history'); 
+Route::get('/admin/ticket-ots/export', [TicketOtsController::class, 'exportHistory'])->name('admin.ticket.export');

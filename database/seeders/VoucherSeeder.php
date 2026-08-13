@@ -11,13 +11,13 @@ class VoucherSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-public function run(): void
-{
-    for ($i = 1; $i <= 800; $i++) {
-        Voucher::create([
-            'code' => str_pad($i, 3, '0', STR_PAD_LEFT),
-            'is_used' => false,
-        ]);
+    public function run(): void
+    {
+        for ($i = 1; $i <= 1000; $i++) {
+            Voucher::create([
+                'code' => str_pad($i, 4, '0', STR_PAD_LEFT), // Menjadi 4 digit (0001 - 1000)
+                'is_used' => false,
+            ]);
+        }
     }
-}
 }

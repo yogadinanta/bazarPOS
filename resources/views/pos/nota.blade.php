@@ -4,41 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cetak Nota #{{ $order->id }}</title>
-    <style>
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            color: #000;
-            width: 58mm;
-            margin: 0;
-            padding: 2px 6px;
-            box-sizing: border-box;
-            line-height: 1.2;
+   <style>
+    body {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 11px;
+        color: #000;
+        width: 65mm;
+        margin: 0;
+        padding: 4px 4px 6px 6mm; 
+        box-sizing: border-box;
+        line-height: 1.2;
+    }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .w-full { width: 100%; }
+    .my-1 { margin-top: 4px; margin-bottom: 4px; }
+    .my-2 { margin-top: 8px; margin-bottom: 8px; }
+    .border-b { border-bottom: 1px dashed #000; }
+    .border-b-dotted { border-bottom: 1px dotted #000; }
+    .space-y-05 p { margin: 2px 0; }
+    .bg-gray { background-color: #f3f4f6; padding: 6px 4px; border: 1px solid #000; }
+    .flex-between { display: flex; justify-content: space-between; }
+    
+    @media print {
+        body { 
+            width: 70mm; 
+            margin: 0; 
+            padding: 4px 4px 6px 6mm; 
         }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .w-full { width: 100%; }
-        .my-1 { margin-top: 4px; margin-bottom: 4px; }
-        .my-2 { margin-top: 8px; margin-bottom: 8px; }
-        .border-b { border-bottom: 1px dashed #000; }
-        .border-b-dotted { border-bottom: 1px dotted #000; }
-        .space-y-05 p { margin: 2px 0; }
-        .bg-gray { background-color: #f3f4f6; padding: 6px 4px; border: 1px solid #000; }
-        .flex-between { display: flex; justify-content: space-between; }
-        
-        @media print {
-            body { width: 58mm; margin: 0; padding: 2px 6px; }
-            .bg-gray { background-color: transparent !important; border: 1px dashed #000; }
-            @page { margin: 0; }
+        .bg-gray { background-color: transparent !important; border: 1px dashed #000; }
+        @page { 
+            margin: 0; 
+            size: 65mm auto; 
         }
-    </style>
+    }
+</style>
 </head>
 <body>
 
     <div class="text-center">
-        <h3 style="margin: 0 0 2px 0; font-size: 13px; font-weight: bold; letter-spacing: 1px;">BAZAR POS INDONESIA</h3>
-        <p style="margin: 0;">Jl. Raya Ubud, Gianyar, Bali</p>
-        <p style="margin: 0;">Telp: 08123456789</p>
+        <h3 style="margin: 0 0 2px 0; font-size: 13px; font-weight: bold; letter-spacing: 1px;">BAZAR VOL.1</h3>
+        <p style="margin: 0;">Jl. Waribang No.27, Kesiman, Kec. Denpasar Tim., Kota Denpasar, Bali 80237</p>
+        <p style="margin: 0;">Telp: +62851-6666-4583</p>
     </div>
     
     <div class="border-b my-2"></div>

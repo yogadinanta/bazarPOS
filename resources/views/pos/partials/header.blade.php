@@ -9,11 +9,13 @@
 
     {{-- SEARCH --}}
     <div class="w-[380px]">
-        <form method="GET">
+        {{-- Arahkan action ke route halaman produk/POS Anda --}}
+        <form action="{{ route('pos.index') }}" method="GET">
             <div class="bg-gray-50 border border-gray-200 rounded-full px-5 h-11 flex items-center shadow-inner">
                 <input
                     type="text"
                     name="search"
+                    value="{{ request('search') }}" {{-- Agar teks pencarian tetap tersimpan di input --}}
                     placeholder="Cari menu favorit..."
                     class="w-full outline-none text-base bg-transparent text-gray-700 placeholder-gray-400"
                 >

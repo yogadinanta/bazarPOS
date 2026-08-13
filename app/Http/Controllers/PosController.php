@@ -12,11 +12,19 @@ use App\Models\OrderDetail;
 
 class PosController extends Controller
 {
-    public function index()
+public function index(Request $request)
     {
         $categories = Category::all();
-        // Menggunakan paginate (misal 20 produk per halaman) agar refresh halaman POS tidak berat
-        $products = Product::paginate(20); 
+        
+        // Tangkap input pencarian dari navbar
+        $search = $request->input('search');
+
+        // Filter produk berdasarkan nama jika ada keyword pencarian
+        $products = Product::when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->paginate(20); 
+
         $vouchers = Voucher::where('is_used', false)->get(['code']);
 
         return view('pos.index', compact('categories', 'products', 'vouchers'));
